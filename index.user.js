@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Selenoid Clipboard Control
-// @version     4.1.2
+// @version     4.1.3
 // @author      Viktar Silakou
 // @namespace   SCC
 // @homepage    https://github.com/viktor-silakov/selenoid-clipboard-control
