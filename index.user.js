@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Selenoid Clipboard Control
-// @version     4.1.3
+// @version     4.1.6
 // @author      Viktar Silakou
 // @namespace   SCC
 // @homepage    https://github.com/viktor-silakov/selenoid-clipboard-control
@@ -78,25 +78,26 @@
         }
 
         window.addEventListener('load', () => {
-                if (!document.querySelector(".vnc-card__controls")) return;
-                console.log('Selenoid Clipboard Control user script starting...')
+                setTimeout(() => {
+                        if (!document.querySelector(".vnc-card__controls")) return;
+                        console.log('Selenoid Clipboard Control user script starting...')
 
-                const sessionId = document.URL.toString().replace(/(^.+?)sessions[\/]/, '');
+                        const sessionId = document.URL.toString().replace(/(^.+?)sessions[\/]/, '');
 
-                const baseUrl = BASE_URL || `${location.protocol}//${document.domain}`
-                const selenoidHubPort = SELENOID_HUB_PORT || '4444'
-                const url = `${baseUrl}:${selenoidHubPort}/clipboard/${sessionId}`
-                console.log({ url })
-                const getClipBoard = () => {
-                    return request(url);
-                }
+                        const baseUrl = BASE_URL || `${location.protocol}//${document.domain}`
+                        const selenoidHubPort = SELENOID_HUB_PORT || '4444'
+                        const url = `${baseUrl}:${selenoidHubPort}/clipboard/${sessionId}`
+                        console.log({ url })
+                        const getClipBoard = () => {
+                            return request(url);
+                        }
 
-                const setClipBoard = (data) => {
-                    return request(url, 'POST', data);
-                }
+                        const setClipBoard = (data) => {
+                            return request(url, 'POST', data);
+                        }
 
-                const style = document.createElement('style');
-                style.innerText = ` 
+                        const style = document.createElement('style');
+                        style.innerText = ` 
                     .clp-buttons {
                         background-color: #ff4d4d !important;
                         color: #ff4d4d !important;
@@ -107,35 +108,36 @@
                         color: #ffffff !important;
                         cursor: pointer;
                     }`;
-                document.body.appendChild(style);
+                        document.body.appendChild(style);
 
-                document.addEventListener('paste', async function (event) {
-                    const clipText = event.clipboardData.getData('Text');
-                    console.log({ clipText })
-                    const resp = await setClipBoard(sessionId, clipText);
-                    console.log({
-                        resp
-                    })
-                });
+                        document.addEventListener('paste', async function (event) {
+                            const clipText = event.clipboardData.getData('Text');
+                            console.log({ clipText })
+                            const resp = await setClipBoard(sessionId, clipText);
+                            console.log({
+                                resp
+                            })
+                        });
 
-                waitForElm('[title=Fullscreen]').then(async () => {
+                        waitForElm('[title=Fullscreen]').then(async () => {
 
-                        addButton(async () => {
-                                const resp = await getClipBoard();
-                                console.log({
-                                    'remote clipboard': resp,
-                                })
-                                GM.setClipboard(resp);
-                            }
-                            , 'G', 'get remote clipboard data');
-                        addButton(async () => {
-                                const text = prompt('please insert text')
-                                const resp = await setClipBoard(text);
-                                console.log({
-                                    resp
-                                })
-                            }
-                            , 'S', 'set remote clipboard data')
+                            addButton(async () => {
+                                    const resp = await getClipBoard();
+                                    console.log({
+                                        'remote clipboard': resp,
+                                    })
+                                    GM.setClipboard(resp);
+                                }
+                                , 'G', 'get remote clipboard data');
+                            addButton(async () => {
+                                    const text = prompt('please insert text')
+                                    const resp = await setClipBoard(text);
+                                    console.log({
+                                        resp
+                                    })
+                                }
+                                , 'S', 'set remote clipboard data')
+                        }, 100)
                     }
                 )
             }
