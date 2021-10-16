@@ -1,7 +1,7 @@
 ## Selenoid Clipboard Control Userscript
 
 TamperMonkey, userscript to get/set clipboard data to remote Selenoid UI containers.
-
+![guide](guide.gif)
 ### Install
 
 - Install Tampermonkey for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/) or [Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
