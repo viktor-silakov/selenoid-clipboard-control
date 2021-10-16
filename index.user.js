@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name        Selenoid Clipboard Control
-// @version     3.9
+// @version     4.1.2
 // @author      Viktar Silakou
 // @namespace   SCC
 // @homepage    https://github.com/viktor-silakov/selenoid-clipboard-control
 // @description Selenoid Clipboard Control User Script
-// @match       */#/sessions/*
+// @match       *
+// @connect     *
+// @run-at      document-body
 // @grant       GM.xmlHttpRequest
 // @grant       GM.setValue
 // @grant       GM.getValue
@@ -16,7 +18,8 @@
 (function () {
         'use strict';
         // change the value if you use custom selenoid hub port
-        const selenoidHubPort = '4444';
+        const BASE_URL = '';
+        const SELENOID_HUB_PORT = '';
 
         function waitForElm(selector) {
             return new Promise(resolve => {
@@ -55,17 +58,6 @@
             )
         }
 
-        console.log('Selenoid Clipboard Control user script starting...')
-
-        const getClipBoard = (sessionId) => {
-            console.log(`${location.protocol}//${document.domain}:${selenoidHubPort}/clipboard/${sessionId}`)
-            return request(`${location.protocol}//${document.domain}:${selenoidHubPort}/clipboard/${sessionId}`);
-        }
-
-        const setClipBoard = (sessionId, data) => {
-            console.log(`${location.protocol}//${document.domain}:${selenoidHubPort}/clipboard/${sessionId}`)
-            return request(`${location.protocol}//${document.domain}:${selenoidHubPort}/clipboard/${sessionId}`, 'POST', data);
-        }
 
         const addButton = (action, text, title = '') => {
             const toolbar = document.getElementsByClassName('vnc-card__controls')[0];
@@ -86,7 +78,23 @@
         }
 
         window.addEventListener('load', () => {
+                if (!document.querySelector(".vnc-card__controls")) return;
+                console.log('Selenoid Clipboard Control user script starting...')
+
                 const sessionId = document.URL.toString().replace(/(^.+?)sessions[\/]/, '');
+
+                const baseUrl = BASE_URL || `${location.protocol}//${document.domain}`
+                const selenoidHubPort = SELENOID_HUB_PORT || '4444'
+                const url = `${baseUrl}:${selenoidHubPort}/clipboard/${sessionId}`
+                console.log({ url })
+                const getClipBoard = () => {
+                    return request(url);
+                }
+
+                const setClipBoard = (data) => {
+                    return request(url, 'POST', data);
+                }
+
                 const style = document.createElement('style');
                 style.innerText = ` 
                     .clp-buttons {
@@ -113,7 +121,7 @@
                 waitForElm('[title=Fullscreen]').then(async () => {
 
                         addButton(async () => {
-                                const resp = await getClipBoard(sessionId);
+                                const resp = await getClipBoard();
                                 console.log({
                                     'remote clipboard': resp,
                                 })
@@ -122,7 +130,7 @@
                             , 'G', 'get remote clipboard data');
                         addButton(async () => {
                                 const text = prompt('please insert text')
-                                const resp = await setClipBoard(sessionId, text);
+                                const resp = await setClipBoard(text);
                                 console.log({
                                     resp
                                 })
